@@ -2,6 +2,10 @@ const formulario=document.querySelector("#formulario")
 const resultado=document.querySelector("#resultado")
 const monto=document.querySelector("#monto")
 const moneda=document.querySelector("#moneda")
+const spinner=document.querySelector("#spinner")
+
+const ctx = document.getElementById('myChart');
+let grafico;
 
 
 const getValores= async (moneda) => {
@@ -15,8 +19,10 @@ const getValores= async (moneda) => {
         if(!responseDays.ok){
             throw "Error al obtener los datos para el grafico"
         }
-        const data = await response.json();
-        console.log(data);
+        const dataHoy = await responseToday.json();
+        const dataDays = await responseDays.json();
+        console.log(dataHoy);
+        return {valorHoy:dataHoy[moneda].valor,valorDays:dataDays.serie.slice(0,10).reverse()};
     }catch(error){
         resultado.innerHTML=`<p>Error al obtener los datos desde la api</p>`
 
@@ -25,23 +31,76 @@ const getValores= async (moneda) => {
     
 };
 
+const validaciones=()=>{
+    
+    if(isNaN(parseInt(monto.value))){
+        resultado.innerHTML=`<p>Debe ingresar un número en moneda</p>`;
+    return false;
+    }
+    return true;
+}
+const renderChart=(labels,data)=>{
+    console.log(grafico)
+    if(grafico){
+        grafico.destroy();
+    }
+    grafico= new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Valores en cl pesos',
+            data: data,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          }
+        }
+      });
+     
+
+}
+
 formulario.addEventListener("submit", async(e)=>{
     e.preventDefault();
-
-    const response=await fetch("https://mindicador.cl/ap");
-    console.log(response);
-    if(!response.ok){
-        return console.log("error");
+    if(validaciones()==false){
+        return;
     }
-    const data=await response.json();
+   
+    let valores;
+    try{
+        spinner.classList.remove("d-none")
+        valores=await getValores(moneda.value);
+        if(valores===undefined){
+            throw "Hay un error al traer datos"
+        }
+    }catch(error){
+        console.log("Error")
+    }finally{
+        spinner.classList.add("d-none")
+       
 
-    console.log(data[moneda.value]);
-    resultado.innerHTML=`<p></p>`;
+
+    }
+    
+    console.log(valores.valorDays);
+    const labels = valores.valorDays.map((item) => {
+        return item.fecha.split("T")[0].split("-").reverse().join("-");
+    });
+    
+    const data = valores.valorDays.map((item) => {
+        return item.valor;
+    });
+   
+    resultado.innerHTML=`<p>Resultado:${parseInt(monto.value)/parseFloat(valores.valorHoy)}</p>`
+    renderChart(labels,data);
 
 })
 
-const renderChar=async(moneda)=>{
 
-    const resp= await fetch(`https://mindicador.cl/api/${moneda}`);
 
-}

@@ -16,11 +16,16 @@ main{
 }
 .card{
     
-    width: 20vw;
-    height: 30vh;
+    width: 30vw;
+    height: 40vh;
     background-color: gray;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+.grafico{
+    width: 40vw;
+    height: 40vh;
+
 }
