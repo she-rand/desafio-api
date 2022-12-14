@@ -34,7 +34,7 @@ const getValores= async (moneda) => {
 const validaciones=()=>{
     
     if(isNaN(parseInt(monto.value))){
-        resultado.innerHTML=`<p>Debe ingresar un número en moneda</p>`;
+        resultado.innerHTML=`<p>Debe ingresar un número en monto</p>`;
     return false;
     }
     return true;
