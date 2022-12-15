@@ -37,6 +37,10 @@ const validaciones=()=>{
         resultado.innerHTML=`<p>Debe ingresar un número en monto</p>`;
     return false;
     }
+    if(parseInt(monto.value)<0){
+        resultado.innerHTML=`<p>Debe ingresar un número positivo</p>`;
+    return false;
+    }
     return true;
 }
 const renderChart=(labels,data)=>{
